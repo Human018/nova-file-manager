@@ -22,19 +22,20 @@
 import { SearchIcon } from '@heroicons/vue/outline'
 import { mapActions, mapState } from 'vuex'
 import debounce from 'lodash/debounce'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   components: {
     SearchIcon,
   },
 
-  computed: {
-    ...mapState('nova-file-manager', ['search']),
-  },
+  mixins: [InteractsWithFileManagerStore],
+
+  states: ['search'],
+
+  actions: ['setSearch'],
 
   methods: {
-    ...mapActions('nova-file-manager', ['setSearch']),
-
     _search: debounce(function ({ target: { value } }) {
       this.setSearch(value)
     }, Nova.config('debounce')),

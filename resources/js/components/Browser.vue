@@ -2,13 +2,13 @@
   <div class="flex flex-1 items-stretch overflow-hidden rounded-md w-full min-h-[30vh]">
     <main class="relative flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-800">
       <div class="w-full px-4 space-y-4 mb-4">
-        <Toolbar />
+        <Toolbar :namespace="namespace"/>
 
         <div
           class="w-full h-80 flex justify-center items-center"
           v-if="isFetchingData"
         >
-          <Spinner class="w-16 h-16" />
+          <Spinner class="w-16 h-16"/>
         </div>
 
         <template v-else>
@@ -17,6 +17,7 @@
             :files="files"
             :directories="directories"
             :filled="filled"
+            :namespace="namespace"
           />
         </template>
       </div>
@@ -30,6 +31,7 @@
         :current-page="pagination.current_page"
         :last-page="pagination.last_page"
         class="mt-auto"
+        :namespace="namespace"
       />
     </main>
   </div>
@@ -40,9 +42,9 @@
 import Toolbar from '@/components/Toolbar'
 import Pagination from '@/components/Pagination'
 import Spinner from '@/components/Elements/Spinner'
-import { mapActions, mapMutations, mapState } from 'vuex'
 import Sidebar from '@/components/Sidebar'
 import BrowserContent from '@/components/BrowserContent'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   components: {
@@ -52,6 +54,31 @@ export default {
     Spinner,
     Sidebar,
   },
+
+  mixins: [InteractsWithFileManagerStore],
+
+  actions: ['init', 'setPath', 'getData', 'getDisks'],
+
+  mutations: ['destroy', 'setSelectedFile'],
+
+  states: [
+    'disk',
+    'disks',
+    'path',
+    'files',
+    'directories',
+    'breadcrumbs',
+    'pagination',
+    'page',
+    'perPage',
+    'perPageOptions',
+    'selectedFile',
+    'view',
+    'isFetchingData',
+    'isFetchingDisks',
+    'isPreviewOpen',
+    'isFieldMode',
+  ],
 
   mounted() {
     this.init()
@@ -63,32 +90,9 @@ export default {
     this.destroy()
   },
   computed: {
-    ...mapState('nova-file-manager', [
-      'disk',
-      'disks',
-      'path',
-      'files',
-      'directories',
-      'breadcrumbs',
-      'pagination',
-      'page',
-      'perPage',
-      'perPageOptions',
-      'selectedFile',
-      'view',
-      'isFetchingData',
-      'isFetchingDisks',
-      'isPreviewOpen',
-      'isFieldMode',
-    ]),
     filled() {
       return this.files?.length || this.directories?.length
     },
-  },
-
-  methods: {
-    ...mapMutations('nova-file-manager', ['init', 'destroy', 'setSelectedFile']),
-    ...mapActions('nova-file-manager', ['setPath', 'getData', 'getDisks']),
   },
 }
 </script>

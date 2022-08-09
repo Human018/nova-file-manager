@@ -8,13 +8,13 @@
       <span class="truncate text-xs">{{ file.name }}</span>
     </div>
     <div
-      class="aspect-w-1 aspect-h-1 block w-full overflow-hidden rounded-lg"
       :class="mode !== 'form' && 'cursor-pointer'"
+      class="aspect-w-1 aspect-h-1 block w-full overflow-hidden rounded-lg"
       @click="setPreviewFile(file)"
     >
       <div
-        class="w-full h-full"
         v-if="file.type === 'image'"
+        class="w-full h-full"
       >
         <img
           :src="file.url"
@@ -27,7 +27,7 @@
         class="w-full h-full"
       >
         <video class="w-full">
-          <source :src="file.url" />
+          <source :src="file.url"/>
           Sorry, your browser doesn't support embedded videos.
         </video>
       </div>
@@ -35,48 +35,49 @@
         v-else
         class="m-auto flex items-center justify-center bg-gray-200 dark:bg-gray-900 group-hover:opacity-75 text-gray-500"
       >
-        <DocumentIcon class="h-16 w-16 text-gray-600" />
+        <DocumentIcon class="h-16 w-16 text-gray-600"/>
       </div>
     </div>
     <div class="flex flex-row justify-between text-xs">
       <span
         class="inline-flex items-center text-xs p-1 rounded font-medium bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-400"
-        >{{ file.size }}
+      >{{ file.size }}
       </span>
 
       <button
+        v-if="mode === 'form'"
         class="bg-red-400/20 dark:bg-red-800/30 rounded-md p-1 text-red-500"
         @click.prevent="remove(file)"
-        v-if="mode === 'form'"
       >
-        <TrashIcon class="w-3 h-3" />
+        <TrashIcon class="w-3 h-3"/>
       </button>
 
       <Transition
+        v-else
         mode="out-in"
         name="fade"
-        v-else
       >
         <button
-          class="rounded-md p-1 transition-all bg-green-400/20 dark:bg-green-800/30 text-green-500"
           v-if="selected"
+          class="rounded-md p-1 transition-all bg-green-400/20 dark:bg-green-800/30 text-green-500"
         >
-          <CheckIcon class="w-4 h-4" />
+          <CheckIcon class="w-4 h-4"/>
         </button>
         <button
+          v-else
           class="rounded-md p-1 transition-all bg-blue-400/20 dark:bg-blue-800/30 text-blue-500"
           @click.prevent="copy(file)"
-          v-else
         >
-          <ClipboardCopyIcon class="w-4 h-4" />
+          <ClipboardCopyIcon class="w-4 h-4"/>
         </button>
       </Transition>
     </div>
 
     <preview-modal
-      :file="file"
-      :without-actions="true"
       v-if="mode !== 'form'"
+      :file="file"
+      :namespace="namespace"
+      :without-actions="true"
     />
   </div>
 </template>
@@ -85,19 +86,20 @@
 import { CopiesToClipboard } from 'laravel-nova'
 import PreviewModal from '@/components/Modals/PreviewModal'
 import { CheckIcon, ClipboardCopyIcon, DocumentIcon, TrashIcon } from '@heroicons/vue/outline'
-import { mapMutations } from 'vuex'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   name: 'FieldCard',
-  mixins: [CopiesToClipboard],
+
+  mixins: [CopiesToClipboard, InteractsWithFileManagerStore],
 
   components: { DocumentIcon, ClipboardCopyIcon, CheckIcon, TrashIcon, PreviewModal },
 
-  data() {
-    return {
-      selected: false,
-    }
-  },
+  mutations: ['previewFile', 'deselectFile'],
+
+  data: () => ({
+    selected: false,
+  }),
 
   props: {
     file: {
@@ -112,8 +114,6 @@ export default {
   },
 
   methods: {
-    ...mapMutations('nova-file-manager', ['previewFile', 'deselectFile']),
-
     copy(file) {
       this.selected = true
       this.copyValueToClipboard(file.url)
@@ -137,5 +137,3 @@ export default {
   },
 }
 </script>
-
-<style scoped></style>

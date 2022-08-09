@@ -18,7 +18,7 @@
           :current="view"
           :set-view="setView"
         />
-        <ToolbarSearch />
+        <ToolbarSearch/>
       </div>
       <div class="flex flex-row gap-x-2 justify-end w-full md:w-auto">
         <IconButton
@@ -26,42 +26,43 @@
           v-if="isFieldMode"
           @click="closeBrowser"
         >
-          <XIcon class="w-5 h-5" />
+          <XIcon class="w-5 h-5"/>
         </IconButton>
         <IconButton @click="openModal('createFolder')">
-          <FolderAddIcon class="w-5 h-5" />
+          <FolderAddIcon class="w-5 h-5"/>
         </IconButton>
         <IconButton
           @click="openModal('upload')"
           variant="primary"
         >
-          <CloudUploadIcon class="h-5 w-5" />
+          <CloudUploadIcon class="h-5 w-5"/>
         </IconButton>
         <IconButton
           @click="closeBrowser"
           variant="success"
           v-if="isFieldMode"
         >
-          <CheckIcon class="h-5 w-5" />
+          <CheckIcon class="h-5 w-5"/>
         </IconButton>
       </div>
     </div>
     <Breadcrumbs
       :items="breadcrumbs"
       :set-path="setPath"
+      :namespace="namespace"
     />
   </div>
 
-  <UploadModal name="upload" />
+  <UploadModal name="upload" :namespace="namespace" />
 
   <CreateFolderModal
     name="createFolder"
     :on-submit="createFolder"
+    :namespace="namespace"
   />
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from 'vuex'
 import { CheckIcon, CloudUploadIcon, FolderAddIcon, XIcon } from '@heroicons/vue/outline'
 import DiskSelector from '@/components/DiskSelector'
 import PaginationSelector from '@/components/Elements/PaginationSelector'
@@ -71,6 +72,9 @@ import ToolbarSearch from '@/components/Elements/ToolbarSearch'
 import ViewToggle from '@/components/Elements/ViewToggle'
 import UploadModal from '@/components/Modals/UploadModal'
 import CreateFolderModal from '@/components/Modals/CreateFolderModal'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
+import { mapActions, mapMutations, mapState } from 'vuex'
+import { store as toolStore } from '@/store/store'
 
 export default {
   name: 'Toolbar',
@@ -88,32 +92,44 @@ export default {
     CreateFolderModal,
     ToolbarSearch,
   },
-  methods: {
-    ...mapMutations('nova-file-manager', ['setSelectedFile']),
-    ...mapActions('nova-file-manager', [
-      'setDisk',
-      'setPath',
-      'setPerPage',
-      'setPath',
-      'createFolder',
-      'openModal',
-      'closeBrowser',
-      'setView',
-    ]),
-  },
-  computed: {
-    ...mapState('nova-file-manager', [
-      'path',
-      'disk',
-      'disks',
-      'view',
-      'perPage',
-      'breadcrumbs',
-      'perPageOptions',
-      'selectedFile',
-      'isFieldMode',
-      'selection',
-    ]),
+
+  props: ['namespace'],
+
+  // mixins: [InteractsWithFileManagerStore],
+
+  beforeCreate() {
+    this.$options.methods = {
+      ...this.$options.methods,
+      ...mapMutations(this.$props.namespace, [
+        'setDisk',
+        'setPath',
+        'setPerPage',
+        'setPath',
+        'createFolder',
+        'openModal',
+        'closeBrowser',
+        'setView',
+      ]),
+      ...mapActions(this.$props.namespace, ['setSelectedFile'])
+    }
+
+    this.$options.computed = {
+      ...this.$options.computed,
+      ...mapState(this.$props.namespace, [
+        'path',
+        'disk',
+        'disks',
+        'view',
+        'perPage',
+        'breadcrumbs',
+        'perPageOptions',
+        'selectedFile',
+        'isFieldMode',
+        'selection',
+      ])
+    }
+
+    this
   },
 }
 </script>

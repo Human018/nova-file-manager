@@ -69,7 +69,7 @@
 <script>
 import Button from '@/components/Elements/Button'
 import InputModal from '@/components/Modals/InputModal'
-import { mapActions, mapState } from 'vuex'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   components: {
@@ -78,6 +78,12 @@ export default {
   },
 
   props: ['name', 'onSubmit'],
+
+  mixins: [InteractsWithFileManagerStore],
+
+  states: ['errors'],
+
+  actions: ['closeModal'],
 
   data: () => ({
     value: null,
@@ -88,7 +94,6 @@ export default {
   },
 
   computed: {
-    ...mapState('nova-file-manager', ['errors']),
     hasErrors() {
       return this.errors?.has('createFolder')
     },
@@ -98,7 +103,6 @@ export default {
   },
 
   methods: {
-    ...mapActions('nova-file-manager', ['closeModal']),
     submit() {
       this.onSubmit(this.value)
 

@@ -83,7 +83,7 @@
 
 <script>
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/solid'
-import { mapActions } from 'vuex'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   components: {
@@ -93,8 +93,8 @@ export default {
 
   props: ['currentPage', 'from', 'to', 'total', 'lastPage', 'links'],
 
-  methods: {
-    ...mapActions('nova-file-manager', ['setPage']),
-  },
+  mixins: [InteractsWithFileManagerStore],
+
+  actions: ['setPage'],
 }
 </script>

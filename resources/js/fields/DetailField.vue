@@ -27,31 +27,30 @@ import { mapMutations, mapState } from 'vuex'
 import ImageLoader from '@/components/ImageLoader'
 import PreviewModal from '@/components/Modals/PreviewModal'
 import FieldCard from '@/components/Cards/FieldCard'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
-  mixins: [CopiesToClipboard],
+  mixins: [CopiesToClipboard, InteractsWithFileManagerStore],
 
   components: { FieldCard, DocumentIcon, ImageLoader, ClipboardCopyIcon, CheckIcon, PreviewModal },
 
   props: ['field', 'index'],
 
-  computed: {
-    ...mapState('nova-file-manager', ['darkMode']),
-  },
+  states: ['darkMode'],
+
+  actions: ['init'],
+
+  mutations: ['detectDarkMode', 'previewFile'],
 
   mounted() {
     this.detectDarkMode()
   },
 
-  data() {
-    return {
-      selected: null,
-    }
-  },
+  data: () => ({
+    selected: null,
+  }),
 
   methods: {
-    ...mapMutations('nova-file-manager', ['init', 'detectDarkMode', 'previewFile']),
-
     copy(file) {
       this.selected = file
       this.copyValueToClipboard(file.url)

@@ -6,6 +6,7 @@
     :title="__('Are you sure you want to delete this file?')"
     :content="__('This will will delete the file from the storage. This action cannot be undone.')"
     variant="danger"
+    :namespace="namespace"
   >
     <template v-slot:confimButton>
       <Button
@@ -36,6 +37,7 @@
 import { ExclamationIcon } from '@heroicons/vue/outline'
 import ConfirmModal from '@/components/Modals/ConfirmModal'
 import Button from '@/components/Elements/Button'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   components: {
@@ -58,6 +60,8 @@ export default {
       default: () => {},
     },
   },
+
+  mixins: [InteractsWithFileManagerStore],
 
   computed: {
     icon() {

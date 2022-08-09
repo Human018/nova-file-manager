@@ -10,9 +10,10 @@
         :checked="isFileSelected(file) ?? false"
         @click="toggleSelection(file)"
         @dblclick="openPreview(file)"
+        :namespace="namespace"
       />
 
-      <preview-modal :file="file" />
+      <preview-modal :file="file"/>
     </li>
   </ul>
 </template>
@@ -22,17 +23,28 @@ import { RadioGroup, RadioGroupOption } from '@headlessui/vue'
 import ImageCard from './Cards/ImageCard.vue'
 import VideoCard from './Cards/VideoCard.vue'
 import FileCard from './Cards/FileCard.vue'
-import { mapGetters, mapMutations, mapState } from 'vuex'
 import Sidebar from '@/components/Sidebar'
 import PreviewModal from '@/components/Modals/PreviewModal'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
-  data() {
-    return {
-      clicks: 0,
-      timer: null,
-    }
-  },
+  mixins: [InteractsWithFileManagerStore],
+
+  mutations: [
+    'setSelectedFile',
+    'selectFile',
+    'deselectFile',
+    'previewFile',
+  ],
+
+  getters: ['isFileSelected'],
+  states: ['files', 'selection'],
+
+  data: () => ({
+    clicks: 0,
+    timer: null,
+  }),
+
   components: {
     PreviewModal,
     RadioGroup,
@@ -42,13 +54,8 @@ export default {
     FileCard,
     Sidebar,
   },
+
   methods: {
-    ...mapMutations('nova-file-manager', [
-      'setSelectedFile',
-      'selectFile',
-      'deselectFile',
-      'previewFile',
-    ]),
     fileCardComponent(file) {
       switch (file.type) {
         case 'image':
@@ -67,10 +74,6 @@ export default {
     toggleSelection(file) {
       return this.isFileSelected(file) ? this.deselectFile(file) : this.selectFile(file)
     },
-  },
-  computed: {
-    ...mapState('nova-file-manager', ['files', 'selection']),
-    ...mapGetters('nova-file-manager', ['isFileSelected']),
   },
 }
 </script>

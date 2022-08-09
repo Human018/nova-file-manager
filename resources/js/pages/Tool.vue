@@ -5,13 +5,13 @@
 
       <Heading class="mb-6">{{ __('NovaFileManager.title') }}</Heading>
 
-      <Browser />
+      <Browser namespace="nova-file-manager" />
     </div>
   </div>
 </template>
 <script>
 import Browser from '@/components/Browser'
-import { mapMutations, mapState } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 
 export default {
   components: {
@@ -37,8 +37,8 @@ export default {
   },
 
   methods: {
+    ...mapActions('nova-file-manager', ['init']),
     ...mapMutations('nova-file-manager', [
-      'init',
       'setSelection',
       'setLimit',
       'setPath',

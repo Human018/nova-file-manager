@@ -10,13 +10,13 @@
             v-if="isFieldMode"
             @click="closeBrowser"
           >
-            <CheckIcon class="w-5 h-5" />
+            <CheckIcon class="w-5 h-5"/>
           </IconButton>
           <IconButton
             variant="secondary"
             @click.prevent="setSelectedFile(null)"
           >
-            <XIcon class="w-5 h-5" />
+            <XIcon class="w-5 h-5"/>
           </IconButton>
         </div>
         <div class="inline-flex gap-x-2">
@@ -26,19 +26,19 @@
             :href="file.url"
             :download="file.name"
           >
-            <DownloadIcon class="w-5 h-5" />
+            <DownloadIcon class="w-5 h-5"/>
           </IconButton>
           <IconButton
             variant="secondary"
             @click="openModal(`renameFile-${file.id}`)"
           >
-            <PencilAltIcon class="w-5 h-5" />
+            <PencilAltIcon class="w-5 h-5"/>
           </IconButton>
           <IconButton
             variant="danger"
             @click="openModal(`deleteFile-${file.id}`)"
           >
-            <TrashIcon class="w-5 h-5" />
+            <TrashIcon class="w-5 h-5"/>
           </IconButton>
         </div>
       </div>
@@ -56,7 +56,7 @@
                 controls="controls"
                 class="rounded-md"
               >
-                <source :src="file.url" />
+                <source :src="file.url"/>
                 Sorry, your browser doesn't support embedded videos.
               </video>
             </div>
@@ -125,10 +125,10 @@ import {
 } from '@heroicons/vue/outline'
 import { PlayIcon } from '@heroicons/vue/solid'
 import IconButton from '@/components/Elements/IconButton'
-import { mapActions, mapMutations, mapState } from 'vuex'
 import { TransitionRoot } from '@headlessui/vue'
 import DeleteFileModal from '@/components/Modals/DeleteFileModal'
 import RenameFileModal from '@/components/Modals/RenameFileModal'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   name: 'Sidebar',
@@ -146,13 +146,18 @@ export default {
     DeleteFileModal,
     RenameFileModal,
   },
+
   props: ['file'],
-  computed: {
-    ...mapState('nova-file-manager', ['selectedFile', 'isFieldMode']),
-  },
+
+  mixins: [InteractsWithFileManagerStore],
+
+  actions: ['setSelectedFile'],
+
+  mutations: ['deleteFile', 'renameFile', 'openModal', 'closeBrowser'],
+
+  states: ['selectedFile', 'isFieldMode'],
+
   methods: {
-    ...mapMutations('nova-file-manager', ['setSelectedFile']),
-    ...mapActions('nova-file-manager', ['deleteFile', 'renameFile', 'openModal', 'closeBrowser']),
     onRename(value) {
       this.renameFile({ id: this.file.id, oldPath: this.file.path, newPath: value })
     },

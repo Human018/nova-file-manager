@@ -69,7 +69,7 @@
 <script>
 import Button from '@/components/Elements/Button'
 import InputModal from '@/components/Modals/InputModal'
-import { mapActions, mapState } from 'vuex'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   components: {
@@ -79,6 +79,8 @@ export default {
 
   props: ['name', 'onSubmit', 'oldName'],
 
+  mixins: [InteractsWithFileManagerStore],
+
   data: () => ({
     value: null,
   }),
@@ -87,8 +89,11 @@ export default {
     this.value = this.oldName
   },
 
+  states: ['errors'],
+
+  actions: ['closeModal'],
+
   computed: {
-    ...mapState('nova-file-manager', ['errors']),
     hasErrors() {
       return this.errors?.has('renameFile')
     },
@@ -99,7 +104,6 @@ export default {
   },
 
   methods: {
-    ...mapActions('nova-file-manager', ['closeModal']),
     submit() {
       this.onSubmit(this.value)
     },

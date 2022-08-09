@@ -38,7 +38,7 @@
 
 <script>
 import { ChevronRightIcon, HomeIcon } from '@heroicons/vue/outline'
-import { mapState } from 'vuex'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   components: {
@@ -49,8 +49,7 @@ export default {
     items: null,
     setPath: null,
   },
-  computed: {
-    ...mapState('nova-file-manager', ['selection']),
-  },
+  mixins: [InteractsWithFileManagerStore],
+  states: ['selection'],
 }
 </script>

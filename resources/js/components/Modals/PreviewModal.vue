@@ -19,7 +19,7 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div class="fixed inset-0 bg-gray-800/20 backdrop-blur-sm transition-opacity" />
+        <div class="fixed inset-0 bg-gray-800/20 backdrop-blur-sm transition-opacity"/>
       </TransitionChild>
 
       <div
@@ -52,7 +52,7 @@
                     tabindex="0"
                     v-if="!withoutActions"
                   >
-                    <TrashIcon class="w-5 h-5" />
+                    <TrashIcon class="w-5 h-5"/>
                   </IconButton>
                   <IconButton
                     variant="secondary"
@@ -61,21 +61,21 @@
                     :download="file.name"
                     tabindex="1"
                   >
-                    <cloud-download-icon class="w-5 h-5" />
+                    <cloud-download-icon class="w-5 h-5"/>
                   </IconButton>
                   <IconButton
                     variant="secondary"
                     @click="openModal(`renameFile-${file.id}`)"
                     v-if="!withoutActions"
                   >
-                    <pencil-alt-icon class="w-5 h-5" />
+                    <pencil-alt-icon class="w-5 h-5"/>
                   </IconButton>
                   <IconButton
                     @click="closeModal"
                     tabindex="1"
                     ref="completeButtonRef"
                   >
-                    <x-icon class="w-5 h-5" />
+                    <x-icon class="w-5 h-5"/>
                   </IconButton>
                 </div>
               </div>
@@ -97,7 +97,7 @@
                       class="w-full max-w-screen max-h-screen"
                       controls="controls"
                     >
-                      <source :src="file.url" />
+                      <source :src="file.url"/>
                       Sorry, your browser doesn't support embedded videos.
                     </video>
                   </div>
@@ -154,6 +154,7 @@
   <DeleteFileModal
     :name="`deleteFile-${file.id}`"
     :on-confirm="onDelete"
+    :namespace="namespace"
   />
 
   <RenameFileModal
@@ -173,13 +174,13 @@ import {
   TrashIcon,
   XIcon,
 } from '@heroicons/vue/outline'
-import { mapActions, mapMutations, mapState } from 'vuex'
 import IconButton from '@/components/Elements/IconButton'
 import DeleteFileModal from '@/components/Modals/DeleteFileModal'
 import RenameFileModal from '@/components/Modals/RenameFileModal'
 import ImageCard from '@/components/Cards/ImageCard'
 import VideoCard from '@/components/Cards/VideoCard'
 import FileCard from '@/components/Cards/FileCard'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   components: {
@@ -198,6 +199,7 @@ export default {
     RenameFileModal,
     DocumentIcon,
   },
+
   props: {
     file: {
       type: Object,
@@ -208,8 +210,16 @@ export default {
       default: false,
     },
   },
+
+  mixins: [InteractsWithFileManagerStore],
+
+  states: ['darkMode', 'preview'],
+
+  actions: ['deleteFile', 'renameFile'],
+
+  mutations: ['previewFile', 'openModal'],
+
   computed: {
-    ...mapState('nova-file-manager', ['darkMode', 'preview']),
     isOpen() {
       return this.preview?.id === this.file?.id
     },
@@ -225,8 +235,6 @@ export default {
     },
   },
   methods: {
-    ...mapMutations('nova-file-manager', ['previewFile', 'openModal']),
-    ...mapActions('nova-file-manager', ['deleteFile', 'renameFile']),
     closeModal() {
       this.previewFile(null)
     },

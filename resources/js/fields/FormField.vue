@@ -65,7 +65,7 @@
         leave-to="opacity-0"
         class="z-[60]"
       >
-        <div class="fixed inset-0 bg-gray-800/20 backdrop-blur-sm transition-opacity" />
+        <div class="fixed inset-0 bg-gray-800/20 backdrop-blur-sm transition-opacity"/>
       </TransitionChild>
 
       <div :class="`fixed z-[60] inset-0 overflow-y-auto w-full ${darkMode && 'dark'}`">
@@ -82,7 +82,7 @@
             <DialogPanel
               class="relative bg-transparent rounded-lg overflow-hidden shadow-xl transition-all w-full border border-gray-500 dark:border-gray-600 md:m-8 m-0"
             >
-              <Browser class="w-full" />
+              <Browser class="w-full" :namespace="namespace"/>
             </DialogPanel>
           </TransitionChild>
         </div>
@@ -100,6 +100,8 @@ import { FormField, HandlesValidationErrors } from 'laravel-nova'
 import { mapActions, mapMutations, mapState } from 'vuex'
 import draggable from 'vuedraggable'
 import FieldCard from '@/components/Cards/FieldCard'
+import { store as toolStore } from '@/store/store'
+import { namespace } from '@/helpers'
 
 export default {
   mixins: [FormField, HandlesValidationErrors],
@@ -120,9 +122,45 @@ export default {
 
   props: ['resourceName', 'resourceId', 'field'],
 
-  data() {
-    return {
-      drag: false,
+  data: () => ({
+    drag: false,
+  }),
+
+  beforeCreate() {
+    let module = namespace(this.$props.field.attribute)
+    console.log(module)
+
+    this.$store.registerModule(module, toolStore)
+
+    this.$options.computed = {
+      ...this.$options.computed,
+      ...mapState(module, ['darkMode', 'disk', 'selection']),
+      isOpen() {
+        return this.$store.getters[`${module}/allModals`].includes('browser')
+      },
+
+      files: {
+        get() {
+          return this.selection
+        },
+        set(value) {
+          this.setSelection(value)
+        },
+      },
+    }
+
+    this.$options.methods = {
+      ...this.$options.methods,
+      ...mapActions(module, ['init', 'openModal', 'closeModal']),
+      ...mapMutations(module, [
+        'destroy',
+        'setSelectedFile',
+        'setIsFieldMode',
+        'setValue',
+        'setLimit',
+        'deselectFile',
+        'setSelection',
+      ]),
     }
   },
 
@@ -138,38 +176,15 @@ export default {
   },
 
   computed: {
-    ...mapState('nova-file-manager', ['darkMode', 'disk', 'selection']),
-
-    isOpen() {
-      return this.$store.getters['nova-file-manager/allModals'].includes('browser')
+    namespace() {
+      return namespace(this.field.attribute)
     },
-
-    files: {
-      get() {
-        return this.selection
-      },
-      set(value) {
-        this.setSelection(value)
-      },
-    },
-
     maxWidth() {
       return this.field.maxWidth || 320
     },
   },
 
   methods: {
-    ...mapActions('nova-file-manager', ['openModal', 'closeModal']),
-    ...mapMutations('nova-file-manager', [
-      'init',
-      'destroy',
-      'setSelectedFile',
-      'setIsFieldMode',
-      'setValue',
-      'setLimit',
-      'deselectFile',
-      'setSelection',
-    ]),
     fill(formData) {
       formData.append(
         this.field.attribute,

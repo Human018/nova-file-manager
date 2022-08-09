@@ -1,7 +1,7 @@
 <template>
   <TransitionRoot
-    as="template"
     :show="isOpen"
+    as="template"
     class="nova-file-manager"
   >
     <Dialog
@@ -19,12 +19,12 @@
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div class="fixed inset-0 bg-gray-800/20 backdrop-blur-sm transition-opacity" />
+        <div class="fixed inset-0 bg-gray-800/20 backdrop-blur-sm transition-opacity"/>
       </TransitionChild>
 
       <div
-        class="fixed z-10 inset-0 overflow-y-auto"
         :class="darkMode && 'dark'"
+        class="fixed z-10 inset-0 overflow-y-auto"
       >
         <div
           class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0"
@@ -68,8 +68,8 @@
               <div
                 class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse sm:gap-x-2 space-y-3 sm:space-y-0"
               >
-                <slot name="confimButton" />
-                <slot name="cancelButton" />
+                <slot name="confimButton"/>
+                <slot name="cancelButton"/>
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -81,7 +81,7 @@
 
 <script>
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { mapState } from 'vuex'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 const variants = {
   danger: {
@@ -101,10 +101,13 @@ export default {
 
   props: ['name', 'title', 'content', 'icon', 'variant'],
 
+  mixins: [InteractsWithFileManagerStore],
+
+  states: ['darkMode'],
+
   computed: {
-    ...mapState('nova-file-manager', ['darkMode']),
     isOpen() {
-      return this.$store.getters['nova-file-manager/allModals'].includes(this.name)
+      return this.$store.getters[`${this.namespace}/allModals`].includes(this.name)
     },
     iconBackgroundClass() {
       return this.variant ? variants[this.variant].iconBackground : null
@@ -116,7 +119,7 @@ export default {
 
   methods: {
     closeModal() {
-      this.$store.dispatch('nova-file-manager/closeModal', this.name)
+      this.$store.dispatch(`${this.namespace}/closeModal`, this.name)
     },
   },
 

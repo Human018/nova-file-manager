@@ -22,7 +22,7 @@
 
         <DisclosurePanel>
           <section aria-labelledby="gallery-heading">
-            <DirectoryGrid :directories="directories" />
+            <DirectoryGrid :directories="directories"/>
           </section>
         </DisclosurePanel>
       </Disclosure>
@@ -49,17 +49,17 @@
 
         <DisclosurePanel>
           <section aria-labelledby="gallery-heading">
-            <FileGrid />
+            <FileGrid :namespace="namespace"/>
           </section>
         </DisclosurePanel>
       </Disclosure>
     </div>
   </template>
   <template v-else>
-    <List />
+    <List :namespace="namespace" />
   </template>
 
-  <Empty v-if="!filled" />
+  <Empty v-if="!filled"/>
 </template>
 
 <script>
@@ -69,6 +69,7 @@ import FileGrid from '@/components/FileGrid'
 import DirectoryGrid from '@/components/DirectoryGrid'
 import List from '@/components/List'
 import Empty from '@/components/Empty'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   name: 'BrowserContent',
@@ -83,7 +84,10 @@ export default {
     List,
     Empty,
   },
+
   props: ['view', 'files', 'directories', 'filled'],
+
+  mixins: [InteractsWithFileManagerStore],
 }
 </script>
 

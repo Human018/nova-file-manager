@@ -5,56 +5,45 @@ import errors from '@/helpers/errors'
 
 const store = {
   namespaced: true,
-  state() {
-    return {
-      // file browser state
-      path: null,
-      disk: null,
-      disks: null,
-      page: null,
-      search: null,
-      perPage: 15,
-      perPageOptions: [5, 15, 30, 50],
+  state: () => ({
+    // file browser state
+    path: null,
+    disk: null,
+    disks: null,
+    page: null,
+    search: null,
+    perPage: 15,
+    perPageOptions: [5, 15, 30, 50],
 
-      // files, directories and other data
-      files: null,
-      directories: null,
-      breadcrumbs: null,
-      pagination: null,
-      selectedFile: null,
-      fieldValue: null,
-      errors: null,
-      selection: [],
-      preview: null,
-      limit: 1,
+    // files, directories and other data
+    files: null,
+    directories: null,
+    breadcrumbs: null,
+    pagination: null,
+    selectedFile: null,
+    fieldValue: null,
+    errors: null,
+    selection: [],
+    preview: null,
+    limit: 1,
 
-      // status
-      ready: false,
-      isFieldMode: false,
-      isFetchingDisks: false,
-      isFetchingData: false,
-      isUploading: false,
-      isPreviewOpen: false,
+    // status
+    ready: false,
+    isFieldMode: false,
+    isFetchingDisks: false,
+    isFetchingData: false,
+    isUploading: false,
+    isPreviewOpen: false,
 
-      // misc
-      darkMode: false,
-      darkModeObserver: null,
-      view: 'grid',
-      toolModals: [],
-      csrfToken: null,
-    }
-  },
+    // misc
+    darkMode: false,
+    darkModeObserver: null,
+    view: 'grid',
+    toolModals: [],
+    csrfToken: null,
+  }),
+
   mutations: {
-    // This is the main mutation that is being evaluated when the browser is mounted
-    init(state) {
-      this.commit('nova-file-manager/detectDarkMode')
-      this.commit('nova-file-manager/loadFromLocalStorage')
-      this.commit('nova-file-manager/setFromQueryString')
-
-      state.csrfToken = document.head.querySelector('meta[name="csrf-token"]').content
-      state.ready = true
-    },
-
     // This mutation will be evaluated when the browser is unmounted
     destroy(state) {
       state.darkModeObserver?.disconnect()
@@ -78,51 +67,6 @@ const store = {
           childList: false,
           characterData: false,
         })
-      }
-    },
-
-    // we save the current state to localStorage, and this handy function allows us to retrieve it
-    loadFromLocalStorage(state) {
-      if (state.isFieldMode) {
-        return
-      }
-
-      // we only remember a few parameters
-      const keysToRetrieve = ['perPage', 'view', 'disk']
-
-      // then we can loop on these keys
-      keysToRetrieve.forEach((key) => {
-        const value = window?.localStorage.getItem(`nova-file-manager::${key}`)
-
-        if (value) {
-          // and then trigger the corresponding setter mutation
-          this.commit(`nova-file-manager/set${key.charAt(0).toUpperCase() + key.slice(1)}`, value)
-        }
-      })
-    },
-
-    // when accessing the browser through a url that contains a query string, we can use this mutation to set the state from the query string
-    setFromQueryString(state) {
-      if (state.isFieldMode) {
-        return
-      }
-
-      // grab all the query strings in the current url
-      const searchParams = Object.fromEntries(
-        new URLSearchParams(window?.location.search).entries(),
-      )
-
-      // loop on each query string
-      for (const [key, value] of Object.entries(searchParams)) {
-        // if we match one of these keys, we trigger the setter mutation
-        if (['path', 'disk', 'page', 'perPage'].includes(key)) {
-          this.commit(`nova-file-manager/set${key.charAt(0).toUpperCase() + key.slice(1)}`, value)
-        }
-      }
-
-      // a trick to set the path to the root if we go back a level
-      if (!window.location.href.includes('?')) {
-        this.commit('nova-file-manager/setPath', '/')
       }
     },
 
@@ -204,7 +148,6 @@ const store = {
       state.limit = limit
     },
     setSelection(state, value) {
-      console.log('setSelection', value)
       state.selection = value
     },
     openModal: (state, payload) => {
@@ -215,6 +158,61 @@ const store = {
     },
   },
   actions: {
+    // This is the main mutation that is being evaluated when the browser is mounted
+    init({ state, commit, dispatch }) {
+      commit('detectDarkMode')
+      dispatch('loadFromLocalStorage')
+      dispatch('setFromQueryString')
+
+      state.csrfToken = document.head.querySelector('meta[name="csrf-token"]').content
+      state.ready = true
+    },
+
+    // we save the current state to localStorage, and this handy function allows us to retrieve it
+    loadFromLocalStorage({ state, commit }) {
+      if (state.isFieldMode) {
+        return
+      }
+
+      // we only remember a few parameters
+      const keysToRetrieve = ['perPage', 'view', 'disk']
+
+      // then we can loop on these keys
+      keysToRetrieve.forEach((key) => {
+        const value = window?.localStorage.getItem(`nova-file-manager::${key}`)
+
+        if (value) {
+          // and then trigger the corresponding setter mutation
+          commit(`set${key.charAt(0).toUpperCase() + key.slice(1)}`, value)
+        }
+      })
+    },
+
+    // when accessing the browser through a url that contains a query string, we can use this mutation to set the state from the query string
+    setFromQueryString({ state, commit}) {
+      if (state.isFieldMode) {
+        return
+      }
+
+      // grab all the query strings in the current url
+      const searchParams = Object.fromEntries(
+        new URLSearchParams(window?.location.search).entries(),
+      )
+
+      // loop on each query string
+      for (const [key, value] of Object.entries(searchParams)) {
+        // if we match one of these keys, we trigger the setter mutation
+        if (['path', 'disk', 'page', 'perPage'].includes(key)) {
+          commit(`set${key.charAt(0).toUpperCase() + key.slice(1)}`, value)
+        }
+      }
+
+      // a trick to set the path to the root if we go back a level
+      if (!window.location.href.includes('?')) {
+        commit('setPath', '/')
+      }
+    },
+
     setPath({ state, commit, dispatch }, path) {
       dispatch('reset')
       commit('setPath', path)

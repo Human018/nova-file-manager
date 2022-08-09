@@ -9,7 +9,7 @@
       <div
         class="flex-shrink-0 flex items-center justify-center py-4 pl-3 text-gray-900 dark:text-gray-100 text-sm font-medium"
       >
-        <FolderIcon class="h-3 w-3" />
+        <FolderIcon class="h-3 w-3"/>
       </div>
       <div class="shrink px-2 py-2 truncate">
         <div
@@ -28,7 +28,7 @@
           <MenuButton
             class="flex items-center text-gray-500 hover:text-blue-500 hover:bg-gray-50 dark:hover:bg-gray-600/50 rounded-full focus:outline-none mr-2 p-0.5"
           >
-            <DotsVerticalIcon class="h-3 w-3" />
+            <DotsVerticalIcon class="h-3 w-3"/>
           </MenuButton>
 
           <MenuItems
@@ -37,16 +37,16 @@
             <div class="py-1">
               <MenuItem>
                 <button
-                  @click="openModal(`renameFolder-${id}`)"
                   class="hover:bg-gray-50 dark:hover:bg-gray-800 block w-full text-left cursor-pointer py-2 px-3 focus:outline-none focus:ring rounded truncate whitespace-nowrap text-gray-500 active:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 dark:active:text-gray-600"
+                  @click="openModal(`renameFolder-${id}`)"
                 >
                   {{ __('Rename') }}
                 </button>
               </MenuItem>
               <MenuItem>
                 <button
-                  @click="openModal(`deleteFolder-${id}`)"
                   class="hover:bg-red-50 dark:hover:bg-red-600/20 block w-full text-left cursor-pointer py-2 px-3 focus:outline-none focus:ring rounded truncate whitespace-nowrap text-red-500 dark:text-red-500 dark:hover:text-red-700"
+                  @click="openModal(`deleteFolder-${id}`)"
                 >
                   {{ __('Delete') }}
                 </button>
@@ -78,7 +78,7 @@ import ConfirmModal from '@/components/Modals/ConfirmModal'
 import Button from '@/components/Elements/Button'
 import RenameFolderModal from '@/components/Modals/RenameFolderModal'
 import DeleteFolderModal from '@/components/Modals/DeleteFolderModal'
-import { mapActions } from 'vuex'
+import InteractsWithFileManagerStore from '@/mixins/InteractsWithFileManagerStore'
 
 export default {
   components: {
@@ -97,15 +97,17 @@ export default {
 
   props: ['disk', 'name', 'path', 'id'],
 
-  methods: {
-    ...mapActions('nova-file-manager', [
-      'setPath',
-      'openModal',
-      'closeModal',
-      'renameFolder',
-      'deleteFolder',
-    ]),
+  mixins: [InteractsWithFileManagerStore],
 
+  actions: [
+    'setPath',
+    'openModal',
+    'closeModal',
+    'renameFolder',
+    'deleteFolder',
+  ],
+
+  methods: {
     onRename(value) {
       this.renameFolder({ id: this.id, oldPath: this.path, newPath: value })
     },
