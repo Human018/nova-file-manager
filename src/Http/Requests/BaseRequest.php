@@ -95,17 +95,17 @@ class BaseRequest extends NovaRequest
 
     public function flexibleFieldCollection(FieldCollection $fields, string $attribute, string $name): FieldCollection
     {
-        /** @var \Whitecube\NovaFlexibleContent\Flexible $field */
+        /** @var \Formfeed\NovaFlexibleContent\Flexible $field */
         $field = $fields
-            ->whereInstanceOf('Whitecube\NovaFlexibleContent\Flexible')
+            ->whereInstanceOf('Formfeed\NovaFlexibleContent\Flexible')
             ->findFieldByAttribute($attribute, function () {
                 abort(404);
             });
 
-        /** @var \Whitecube\NovaFlexibleContent\Layouts\Collection $layouts */
+        /** @var \Formfeed\NovaFlexibleContent\Layouts\Collection $layouts */
         abort_unless($layouts = invade($field)->layouts, 404);
 
-        /** @var \Whitecube\NovaFlexibleContent\Layouts\Layout $layout */
+        /** @var \Formfeed\NovaFlexibleContent\Layouts\Layout $layout */
         $layout = $layouts->first(fn ($layout) => $layout->name() === $name);
 
         abort_if($layout === null, 404);
